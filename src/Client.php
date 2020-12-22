@@ -4,6 +4,7 @@ namespace LPhilippo\Magento2Connector;
 
 use LPhilippo\Magento2Connector\Adapter\CurlAdapter;
 use LPhilippo\Magento2Connector\Helper\ResponseHelper;
+use LPhilippo\Magento2Connector\Model\Filter;
 use LPhilippo\Magento2Connector\Response\AdapterResponse;
 
 class Client
@@ -69,34 +70,42 @@ class Client
     }
 
     /**
+     * @param SearchCriteria $searchCriteria
+     *
+     * @return array
+     */
+    public function getSalesOrders(SearchCriteria $searchCriteria)
+    {
+        $response = $this->call(
+            RequestFactory::make(
+                'orders',
+                [
+                    'searchCriteria' => $searchCriteria->toArray(),
+                ]
+            )
+        );
+
+        return $response->getContent();
+    }
+
+    /**
      * @param string $incrementId
      *
      * @return array
      */
     public function getSalesOrder(string $incrementId)
     {
-        $response = $this->call(
-            RequestFactory::make(
-                'orders',
-                [
-                    'searchCriteria' => [
-                        'filter_groups' => [
-                            [
-                                'filters' => [
-                                    [
-                                        'field' => 'increment_id',
-                                        'value' => $incrementId,
-                                        'condition_type' => 'eq',
-                                    ],
-                                ],
-                            ],
-                        ],
-                    ],
-                ]
+        $searchCriteria = new SearchCriteria();
+        $searchCriteria->addFilter(
+            new Filter(
+                'increment_id',
+                $incrementId
             )
         );
 
-        return ResponseHelper::getFirstItemOrNull($response->getContent());
+        return ResponseHelper::getFirstItemOrNull(
+            $this->getSalesOrders($searchCriteria)
+        );
     }
 
     /**
