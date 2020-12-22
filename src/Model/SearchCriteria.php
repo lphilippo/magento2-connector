@@ -37,11 +37,11 @@ class SearchCriteria
     public function toArray()
     {
         return [
-            'filter_groups' => array_map(function (array $filters) {
+            'filter_groups' => array_map(function (array $filterGroup) {
                 return [
                     'filters' => array_map(function (Filter $filter) {
                         return $filter->toArray();
-                    }, $filters),
+                    }, $filterGroup['filters']),
                 ];
             }, $this->filterGroups),
         ];
