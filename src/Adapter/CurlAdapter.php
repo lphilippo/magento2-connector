@@ -77,8 +77,8 @@ class CurlAdapter
     {
         $headers = array_merge(
             [
-                'User-Agent' => 'kranendonk-api-v3/1.0',
                 'Accept' => 'application/json',
+                'User-Agent' => 'magento2-connector-v3/1.0',
             ],
             $request->getHeaders()
         );

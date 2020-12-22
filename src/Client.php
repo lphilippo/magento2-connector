@@ -3,6 +3,7 @@
 namespace LPhilippo\Magento2Connector;
 
 use LPhilippo\Magento2Connector\Adapter\CurlAdapter;
+use LPhilippo\Magento2Connector\Exception\AdapterException;
 use LPhilippo\Magento2Connector\Helper\ResponseHelper;
 use LPhilippo\Magento2Connector\Model\Filter;
 use LPhilippo\Magento2Connector\Response\AdapterResponse;
@@ -64,7 +65,13 @@ class Client
             )
         );
 
-        $this->token = $result->getContent();
+        $content = $result->getContent();
+
+        if (!is_string($content)) {
+            throw new AdapterException('token-not-received');
+        }
+
+        $this->token = $content;
 
         return $this;
     }
@@ -85,7 +92,7 @@ class Client
             )
         );
 
-        return $response->getContent();
+        return $response->getContent()['items'];
     }
 
     /**

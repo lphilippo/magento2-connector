@@ -19,14 +19,12 @@ class SearchCriteria
      */
     public function addFilter(Filter $filter, string $filterGroup = null)
     {
-        // TODO: support filterGroup.
-        if (count($this->filterGroups) === 0) {
-            $this->filterGroups[] = [
-                'filters' => [],
-            ];
-        }
-
-        $this->filterGroups[0]['filters'][] = $filter;
+        // TODO: support mutliple filters per filterGroup.
+        $this->filterGroups[] = [
+            'filters' => [
+                $filter,
+            ],
+        ];
 
         return $this;
     }
