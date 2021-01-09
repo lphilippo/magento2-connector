@@ -123,23 +123,19 @@ class Client
      */
     public function getCatalogProduct(int $productId)
     {
+        $searchCriteria = new SearchCriteria();
+        $searchCriteria->addFilter(
+            new Filter(
+                'entity_id',
+                $productId
+            )
+        );
+
         $response = $this->call(
             RequestFactory::make(
                 'products',
                 [
-                    'searchCriteria' => [
-                        'filter_groups' => [
-                            [
-                                'filters' => [
-                                    [
-                                        'field' => 'entity_id',
-                                        'value' => $productId,
-                                        'condition_type' => 'eq',
-                                    ],
-                                ],
-                            ],
-                        ],
-                    ],
+                    'searchCriteria' => $searchCriteria->toArray(),
                 ]
             )
         );
