@@ -1,8 +1,6 @@
 <?php
 
-namespace LPhilippo\Magento2Connector;
-
-use LPhilippo\Magento2Connector\Model\Filter;
+namespace LPhilippo\Magento2Connector\Model;
 
 class SearchCriteria
 {

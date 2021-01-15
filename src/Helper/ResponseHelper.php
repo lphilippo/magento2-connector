@@ -14,5 +14,7 @@ class ResponseHelper
         if (isset($content['items']) && is_array($content['items'])) {
             return array_shift($content['items']);
         }
+
+        return array_shift($content);
     }
 }

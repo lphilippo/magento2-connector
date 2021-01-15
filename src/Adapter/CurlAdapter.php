@@ -23,7 +23,10 @@ class CurlAdapter
     public const METHOD_PATCH = 'patch';
     public const METHOD_PUT = 'put';
 
-    protected array $options = [];
+    /**
+     * @var array
+     */
+    protected $options = [];
 
     /**
      * @param array $options

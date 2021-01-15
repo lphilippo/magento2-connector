@@ -6,6 +6,7 @@ use LPhilippo\Magento2Connector\Adapter\CurlAdapter;
 use LPhilippo\Magento2Connector\Exception\AdapterException;
 use LPhilippo\Magento2Connector\Helper\ResponseHelper;
 use LPhilippo\Magento2Connector\Model\Filter;
+use LPhilippo\Magento2Connector\Model\SearchCriteria;
 use LPhilippo\Magento2Connector\Response\AdapterResponse;
 
 class Client
