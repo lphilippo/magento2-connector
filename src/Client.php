@@ -131,6 +131,7 @@ class Client
     public function getCatalogProduct(int $productId)
     {
         $searchCriteria = new SearchCriteria();
+
         $searchCriteria->addFilter(
             new Filter(
                 'entity_id',
@@ -138,37 +139,22 @@ class Client
             )
         );
 
-        $response = $this->call(
-            RequestFactory::make(
-                'products',
-                [
-                    'searchCriteria' => $searchCriteria->toArray(),
-                ]
-            )
+        return ResponseHelper::getFirstItemOrNull(
+            $this->getCatalogProducts($searchCriteria)
         );
-
-        return ResponseHelper::getFirstItemOrNull($response->getContent());
     }
 
     /**
      * @param array $attributeIds
+     * @param SearchCriteria $searchCriteria
      *
      * @return array
      */
-    public function getCatalogAttributes(array $attributeIds)
+    public function getCatalogProducts(SearchCriteria $searchCriteria)
     {
-        $searchCriteria = new SearchCriteria();
-        $searchCriteria->addFilter(
-            new Filter(
-                'attribute_id',
-                implode(',', $attributeIds),
-                'in'
-            )
-        );
-
         $response = $this->call(
             RequestFactory::make(
-                'attributes',
+                'products',
                 [
                     'searchCriteria' => $searchCriteria->toArray(),
                 ]
