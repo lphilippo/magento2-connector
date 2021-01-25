@@ -8,6 +8,7 @@ use LPhilippo\Magento2Connector\Helper\ResponseHelper;
 use LPhilippo\Magento2Connector\Model\Filter;
 use LPhilippo\Magento2Connector\Model\SearchCriteria;
 use LPhilippo\Magento2Connector\Response\AdapterResponse;
+use LPhilippo\Magento2Connector\Response\ExceptionResponse;
 
 class Client
 {
@@ -68,7 +69,7 @@ class Client
 
         $content = $result->getContent();
 
-        if (!is_string($content)) {
+        if ($result instanceof ExceptionResponse || !is_string($content)) {
             throw new AdapterException('token-not-received');
         }
 
@@ -93,7 +94,12 @@ class Client
             )
         );
 
-        return $response->getContent()['items'];
+        $content = $response->getContent();
+        if ($response instanceof ExceptionResponse) {
+            throw new AdapterException('unexpected-response: ' . $content['message']);
+        }
+
+        return $content['items'];
     }
 
     /**
@@ -142,6 +148,39 @@ class Client
         );
 
         return ResponseHelper::getFirstItemOrNull($response->getContent());
+    }
+
+    /**
+     * @param array $attributeIds
+     *
+     * @return array
+     */
+    public function getCatalogAttributes(array $attributeIds)
+    {
+        $searchCriteria = new SearchCriteria();
+        $searchCriteria->addFilter(
+            new Filter(
+                'attribute_id',
+                implode(',', $attributeIds),
+                'in'
+            )
+        );
+
+        $response = $this->call(
+            RequestFactory::make(
+                'attributes',
+                [
+                    'searchCriteria' => $searchCriteria->toArray(),
+                ]
+            )
+        );
+
+        $content = $response->getContent();
+        if ($response instanceof ExceptionResponse) {
+            throw new AdapterException('unexpected-response: ' . $content['message']);
+        }
+
+        return $content['items'];
     }
 
     /**
