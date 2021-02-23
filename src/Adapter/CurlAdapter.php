@@ -6,6 +6,7 @@ use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Promise\PromiseInterface;
 use GuzzleHttp\Psr7\Response;
 use GuzzleHttp\RequestOptions;
+use Illuminate\Support\Arr;
 use LPhilippo\Magento2Connector\Exception\AdapterException;
 use LPhilippo\Magento2Connector\Request;
 use LPhilippo\Magento2Connector\ResourceClient;
@@ -40,6 +41,14 @@ class CurlAdapter
         if (!array_key_exists('endpoint', $options)) {
             throw new AdapterException('Endpoint not specified');
         }
+    }
+
+    /**
+     * @return int
+     */
+    private function getTimeoutInSeconds()
+    {
+        return (int) Arr::get($this->options, 'timeout_in_seconds', 10);
     }
 
     /**
@@ -87,10 +96,10 @@ class CurlAdapter
         );
 
         $parameters = [
-            RequestOptions::CONNECT_TIMEOUT => 10,
+            RequestOptions::CONNECT_TIMEOUT => $this->getTimeoutInSeconds(),
             RequestOptions::HEADERS => $headers,
             RequestOptions::QUERY => $request->getQuery(),
-            RequestOptions::TIMEOUT => 10,
+            RequestOptions::TIMEOUT => $this->getTimeoutInSeconds(),
         ];
 
         $requestContentType = $headers['Content-Type'] ?? null;
