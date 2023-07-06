@@ -197,18 +197,20 @@ class Client
     }
 
     /**
-     * @param int $productChanges
+     * @param array $productChanges
      *
      * @return array
      */
-    public function changeProducts(int $productChanges)
+    public function changeProducts(array $productChanges)
     {
         $this->call(
             RequestFactory::makeForPut(
                 'products',
-                [
-                    'products' => $productChanges,
-                ],
+                array_map(function ($productChange) {
+                    return [
+                        'product' => $productChange,
+                    ];
+                }, $productChanges),
                 true
             )
         );

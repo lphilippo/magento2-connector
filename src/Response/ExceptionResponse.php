@@ -14,9 +14,9 @@ class ExceptionResponse extends AdapterResponse
     {
         if ($exception instanceof RequestException && $exception->getResponse()) {
             $response = $exception->getResponse();
+
             $this->content = json_decode($response->getBody()->getContents(), true);
         }
-        var_dump($exception->getTraceAsString());
 
         if (!$this->content) {
             $this->content = [
