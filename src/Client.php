@@ -61,8 +61,8 @@ class Client
             RequestFactory::makeForPost(
                 'integration/admin/token',
                 [
-                    'username' => $username,
                     'password' => $password,
+                    'username' => $username,
                 ]
             )
         );
@@ -190,6 +190,26 @@ class Client
                         'status' => $status,
                     ],
                 ]
+            )
+        );
+
+        return true;
+    }
+
+    /**
+     * @param int $productChanges
+     *
+     * @return array
+     */
+    public function changeProducts(int $productChanges)
+    {
+        $this->call(
+            RequestFactory::makeForPut(
+                'products',
+                [
+                    'products' => $productChanges,
+                ],
+                true
             )
         );
 

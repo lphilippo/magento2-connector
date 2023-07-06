@@ -7,6 +7,7 @@ use GuzzleHttp\Promise\PromiseInterface;
 use GuzzleHttp\Psr7\Response;
 use GuzzleHttp\RequestOptions;
 use Illuminate\Support\Arr;
+use LPhilippo\Magento2Connector\BulkRequest;
 use LPhilippo\Magento2Connector\Exception\AdapterException;
 use LPhilippo\Magento2Connector\Request;
 use LPhilippo\Magento2Connector\ResourceClient;
@@ -41,6 +42,12 @@ class CurlAdapter
         if (!array_key_exists('endpoint', $options)) {
             throw new AdapterException('Endpoint not specified');
         }
+
+        $suffixIndex = mb_strpos($this->options['endpoint'], '/rest/V1');
+        if ($suffixIndex !== false) {
+            // Old endpoint style.
+            $this->options['endpoint'] = mb_substr($this->options['endpoint'], 0, $suffixIndex);
+        }
     }
 
     /**
@@ -64,9 +71,20 @@ class CurlAdapter
 
         $guzzleClient = ResourceClient::get();
 
+        $endpointUrl = implode(
+            '/',
+            array_filter([
+                $this->options['endpoint'],
+                'rest',
+                ($request instanceof BulkRequest ? 'all/async/bulk' : null),
+                'V1',
+                $request->getUri(),
+            ])
+        );
+
         return $guzzleClient->requestAsync(
             $request->getMethod(),
-            $this->options['endpoint'] . $request->getUri(),
+            $endpointUrl,
             $this->createOptions($request)
         )->then(
             function (Response $response) use ($request) {
