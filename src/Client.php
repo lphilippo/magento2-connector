@@ -9,6 +9,7 @@ use LPhilippo\Magento2Connector\Model\Filter;
 use LPhilippo\Magento2Connector\Model\SearchCriteria;
 use LPhilippo\Magento2Connector\Response\AdapterResponse;
 use LPhilippo\Magento2Connector\Response\ExceptionResponse;
+use OTPHP\TOTP;
 
 class Client
 {
