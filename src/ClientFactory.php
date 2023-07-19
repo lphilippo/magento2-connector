@@ -15,6 +15,10 @@ class ClientFactory
     {
         $client = new Client(new CurlAdapter($options));
 
-        return $client->authenticate($options['username'], $options['password']);
+        return $client->authenticate(
+            $options['username'],
+            $options['password'],
+            array_key_exists('google_secret', $options) ? $options['google_secret'] : null
+        );
     }
 }

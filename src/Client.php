@@ -49,21 +49,33 @@ class Client
     /**
      * @param string $username
      * @param string $password
+     * @param string|null $googleSecret
      *
      * @return Client
      */
-    public function authenticate(string $username, string $password)
+    public function authenticate(string $username, string $password, string $googleSecret = null)
     {
         // Remove old token, to prevent sending it along.
         $this->token = null;
+        $endpoint = 'integration/admin/token';
+        $code = null;
+
+        if ($googleSecret) {
+            $endpoint = 'tfa/provider/google/authenticate';
+            $otp = TOTP::create($googleSecret);
+            $code = $otp->now();
+        }
 
         $result = $this->call(
             RequestFactory::makeForPost(
-                'integration/admin/token',
-                [
-                    'password' => $password,
-                    'username' => $username,
-                ]
+                $endpoint,
+                array_filter(
+                    [
+                        'otp' => $code,
+                        'password' => $password,
+                        'username' => $username,
+                    ]
+                )
             )
         );
 
