@@ -15,6 +15,11 @@ class SearchCriteria
     private $filterGroups = [];
 
     /**
+     * @var array
+     */
+    private $sortOrders = [];
+
+    /**
      * @var int
      */
     private $pageSize = 20;
@@ -76,6 +81,23 @@ class SearchCriteria
                 ];
             }, $this->filterGroups),
             'page_size' => $this->pageSize,
+            'sort_orders' => $this->sortOrders
         ];
+    }
+
+      /**
+     * @param string $field
+     * @param string $direction
+     *
+     * @return SearchCriteria
+     */
+    public function addSortOrder(string $field, string $direction = 'ASC')
+    {
+        $this->sortOrders[] = [
+            'field' => $field,
+            'direction' => $direction,
+        ];
+
+        return $this;
     }
 }
