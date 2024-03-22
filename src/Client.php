@@ -96,7 +96,7 @@ class Client
      *
      * @return array
      */
-    public function getSalesOrders(SearchCriteria $searchCriteria)
+    public function getSalesOrders(SearchCriteria $searchCriteria, bool $getRawResponse = false)
     {
         $response = $this->call(
             RequestFactory::make(
@@ -110,6 +110,10 @@ class Client
         $content = $response->getContent();
         if ($response instanceof ExceptionResponse) {
             throw new AdapterException('unexpected-response: ' . $content['message']);
+        }
+
+        if ($getRawResponse) {
+            return $content;
         }
 
         return $content['items'];
