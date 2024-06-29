@@ -21,21 +21,11 @@ abstract class AdapterResponse
      */
     public function __construct(ResponseInterface $response = null)
     {
-        if (!$response) {
+        if (! $response) {
             return;
         }
 
         $this->statusCode = $response->getStatusCode();
-    }
-
-    /**
-     * Return the HTTP Status Code of the response.
-     *
-     * @return int
-     */
-    public function getStatusCode()
-    {
-        return $this->statusCode;
     }
 
     /**
@@ -46,5 +36,15 @@ abstract class AdapterResponse
     public function getContent()
     {
         return $this->content;
+    }
+
+    /**
+     * Return the HTTP Status Code of the response.
+     *
+     * @return int
+     */
+    public function getStatusCode()
+    {
+        return $this->statusCode;
     }
 }

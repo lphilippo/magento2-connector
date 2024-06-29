@@ -18,7 +18,7 @@ class ExceptionResponse extends AdapterResponse
             $this->content = json_decode($response->getBody()->getContents(), true);
         }
 
-        if (!$this->content) {
+        if (! $this->content) {
             $this->content = [
                 'code' => $exception->getCode(),
                 'file' => $exception->getFile(),

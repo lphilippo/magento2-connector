@@ -10,12 +10,7 @@ class Request
     /**
      * @var array
      */
-    protected $result = null;
-
-    /**
-     * @var string
-     */
-    protected $uri;
+    protected $headers = [];
 
     /**
      * @var string
@@ -35,7 +30,12 @@ class Request
     /**
      * @var array
      */
-    protected $headers = [];
+    protected $result = null;
+
+    /**
+     * @var string
+     */
+    protected $uri;
 
     /**
      * Add a set of headers.
@@ -44,7 +44,7 @@ class Request
      *
      * @return Request
      */
-    public function addHeaders(array $headers): Request
+    public function addHeaders(array $headers): self
     {
         $this->headers = array_merge($this->headers, $headers);
 
@@ -118,7 +118,7 @@ class Request
      *
      * @return Request
      */
-    public function setMethod(string $method = null): Request
+    public function setMethod(string $method = null): self
     {
         $this->method = $method;
 
@@ -132,7 +132,7 @@ class Request
      *
      * @return Request
      */
-    public function setPayload(array $payload): Request
+    public function setPayload(array $payload): self
     {
         $this->payload = $payload;
 
@@ -146,7 +146,7 @@ class Request
      *
      * @return Request
      */
-    public function setQuery(array $query): Request
+    public function setQuery(array $query): self
     {
         $this->query = $query;
 
@@ -160,7 +160,7 @@ class Request
      *
      * @return Request
      */
-    public function setResult($result): Request
+    public function setResult($result): self
     {
         $this->result = $result;
 
@@ -174,7 +174,7 @@ class Request
      *
      * @return Request
      */
-    public function setUri(string $uri): Request
+    public function setUri(string $uri): self
     {
         $this->uri = $uri;
 

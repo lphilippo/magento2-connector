@@ -18,7 +18,7 @@ class ResourceClient
      */
     public static function get(): Client
     {
-        if (!self::$instance) {
+        if (! self::$instance) {
             return self::$instance = new Client();
         }
 

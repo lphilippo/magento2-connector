@@ -7,17 +7,17 @@ class Filter
     /**
      * @var string
      */
+    private $conditionType;
+
+    /**
+     * @var string
+     */
     private $field;
 
     /**
      * @var mixed
      */
     private $value;
-
-    /**
-     * @var string
-     */
-    private $conditionType;
 
     /**
      * @param string $field

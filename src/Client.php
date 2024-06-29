@@ -32,19 +32,36 @@ class Client
     }
 
     /**
-     * @param Request $request
+     * @param int $externalId
+     * @param string $status
+     * @param string|null $comment
      *
-     * @return AdapterResponse
+     * @return array
      */
-    protected function call(Request $request)
+    public function addSalesOrderComment(int $externalId, string $status, string $comment = null)
     {
-        if ($this->token) {
-            $request->addHeaders([
-                'Authorization' => 'Bearer ' . $this->token,
-            ]);
+        $response = $this->call(
+            RequestFactory::makeForPost(
+                sprintf('orders/%d/comments', $externalId),
+                [
+                    'statusHistory' => [
+                        'comment' => $comment,
+                        'is_customer_notified' => 0,
+                        'is_visible_on_front' => 0,
+                        'parent_id' => $externalId,
+                        'status' => $status,
+                    ],
+                ]
+            )
+        );
+
+        if ($response instanceof ExceptionResponse) {
+            $content = $response->getContent();
+
+            throw new AdapterException('unexpected-response: ' . ($content && isset($content['message']) ? $content['message'] : 'unknown'));
         }
 
-        return $this->adapter->call($request)->wait();
+        return true;
     }
 
     /**
@@ -82,7 +99,7 @@ class Client
 
         $content = $result->getContent();
 
-        if ($result instanceof ExceptionResponse || !is_string($content)) {
+        if ($result instanceof ExceptionResponse || ! is_string($content)) {
             throw new AdapterException('token-not-received');
         }
 
@@ -92,51 +109,31 @@ class Client
     }
 
     /**
-     * @param SearchCriteria $searchCriteria
+     * @param array $productChanges
      *
      * @return array
      */
-    public function getSalesOrders(SearchCriteria $searchCriteria, bool $getRawResponse = false)
+    public function changeProducts(array $productChanges)
     {
         $response = $this->call(
-            RequestFactory::make(
-                'orders',
-                [
-                    'searchCriteria' => $searchCriteria->toArray(),
-                ]
+            RequestFactory::makeForPut(
+                'products',
+                array_map(function ($productChange) {
+                    return [
+                        'product' => $productChange,
+                    ];
+                }, $productChanges),
+                true
             )
         );
 
-        $content = $response->getContent();
         if ($response instanceof ExceptionResponse) {
-            throw new AdapterException('unexpected-response: ' . $content['message']);
+            $content = $response->getContent();
+            
+            throw new AdapterException('unexpected-response: ' . ($content && isset($content['message']) ? $content['message'] : 'unknown'));
         }
 
-        if ($getRawResponse) {
-            return $content;
-        }
-
-        return $content['items'];
-    }
-
-    /**
-     * @param string $incrementId
-     *
-     * @return array
-     */
-    public function getSalesOrder(string $incrementId)
-    {
-        $searchCriteria = new SearchCriteria();
-        $searchCriteria->addFilter(
-            new Filter(
-                'increment_id',
-                $incrementId
-            )
-        );
-
-        return ResponseHelper::getFirstItemOrNull(
-            $this->getSalesOrders($searchCriteria)
-        );
+        return true;
     }
 
     /**
@@ -179,6 +176,7 @@ class Client
         );
 
         $content = $response->getContent();
+
         if ($response instanceof ExceptionResponse) {
             throw new AdapterException('unexpected-response: ' . $content['message']);
         }
@@ -187,51 +185,66 @@ class Client
     }
 
     /**
-     * @param int $externalId
-     * @param string $status
-     * @param string|null $comment
+     * @param string $incrementId
      *
      * @return array
      */
-    public function addSalesOrderComment(int $externalId, string $status, string $comment = null)
+    public function getSalesOrder(string $incrementId)
     {
-        $this->call(
-            RequestFactory::makeForPost(
-                sprintf('orders/%d/comments', $externalId),
+        $searchCriteria = new SearchCriteria();
+        $searchCriteria->addFilter(
+            new Filter(
+                'increment_id',
+                $incrementId
+            )
+        );
+
+        return ResponseHelper::getFirstItemOrNull(
+            $this->getSalesOrders($searchCriteria)
+        );
+    }
+
+    /**
+     * @param SearchCriteria $searchCriteria
+     *
+     * @return array
+     */
+    public function getSalesOrders(SearchCriteria $searchCriteria, bool $getRawResponse = false)
+    {
+        $response = $this->call(
+            RequestFactory::make(
+                'orders',
                 [
-                    'statusHistory' => [
-                        'comment' => $comment,
-                        'is_customer_notified' => 0,
-                        'is_visible_on_front' => 0,
-                        'parent_id' => $externalId,
-                        'status' => $status,
-                    ],
+                    'searchCriteria' => $searchCriteria->toArray(),
                 ]
             )
         );
 
-        return true;
+        $content = $response->getContent();
+        if ($response instanceof ExceptionResponse) {
+            throw new AdapterException('unexpected-response: ' . $content['message']);
+        }
+
+        if ($getRawResponse) {
+            return $content;
+        }
+
+        return $content['items'];
     }
 
     /**
-     * @param array $productChanges
+     * @param Request $request
      *
-     * @return array
+     * @return AdapterResponse
      */
-    public function changeProducts(array $productChanges)
+    protected function call(Request $request)
     {
-        $this->call(
-            RequestFactory::makeForPut(
-                'products',
-                array_map(function ($productChange) {
-                    return [
-                        'product' => $productChange,
-                    ];
-                }, $productChanges),
-                true
-            )
-        );
+        if ($this->token) {
+            $request->addHeaders([
+                'Authorization' => 'Bearer ' . $this->token,
+            ]);
+        }
 
-        return true;
+        return $this->adapter->call($request)->wait();
     }
 }

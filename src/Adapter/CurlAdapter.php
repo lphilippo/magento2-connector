@@ -6,7 +6,6 @@ use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Promise\PromiseInterface;
 use GuzzleHttp\Psr7\Response;
 use GuzzleHttp\RequestOptions;
-use Illuminate\Support\Arr;
 use LPhilippo\Magento2Connector\BulkRequest;
 use LPhilippo\Magento2Connector\Exception\AdapterException;
 use LPhilippo\Magento2Connector\Request;
@@ -19,10 +18,14 @@ use LPhilippo\Magento2Connector\Response\ExceptionResponse;
  */
 class CurlAdapter
 {
-    public const METHOD_POST = 'post';
-    public const METHOD_GET = 'get';
     public const METHOD_DELETE = 'delete';
+
+    public const METHOD_GET = 'get';
+
     public const METHOD_PATCH = 'patch';
+
+    public const METHOD_POST = 'post';
+
     public const METHOD_PUT = 'put';
 
     /**
@@ -39,7 +42,7 @@ class CurlAdapter
     {
         $this->options = $options;
 
-        if (!array_key_exists('endpoint', $options)) {
+        if (! array_key_exists('endpoint', $options)) {
             throw new AdapterException('Endpoint not specified');
         }
 
@@ -51,21 +54,13 @@ class CurlAdapter
     }
 
     /**
-     * @return int
-     */
-    private function getTimeoutInSeconds()
-    {
-        return (int) Arr::get($this->options, 'timeout_in_seconds', 10);
-    }
-
-    /**
      * @param Request $request
      *
      * @throws AdapterException
      */
     public function call(Request $request): PromiseInterface
     {
-        if (!$request->getMethod()) {
+        if (! $request->getMethod()) {
             throw new AdapterException('Method not specified');
         }
 
@@ -129,5 +124,13 @@ class CurlAdapter
         }
 
         return $parameters;
+    }
+
+    /**
+     * @return int
+     */
+    private function getTimeoutInSeconds()
+    {
+        return (int) (array_key_exists('timeout_in_seconds', $this->options) ? $this->options['timeout_in_seconds'] : 10);
     }
 }
