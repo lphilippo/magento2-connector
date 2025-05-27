@@ -33,24 +33,29 @@ class Client
 
     /**
      * @param int $externalId
-     * @param string $status
+     * @param string|null $status
      * @param string|null $comment
      *
      * @return array
      */
-    public function addSalesOrderComment(int $externalId, string $status, string $comment = null)
+    public function addSalesOrderComment(int $externalId, string $status = null, string $comment = null)
     {
+        $commentPayload = [
+            'comment' => $comment,
+            'is_customer_notified' => 0,
+            'is_visible_on_front' => 0,
+            'parent_id' => $externalId,
+        ];
+
+        if ($status) {
+            $commentPayload['status'] = $status;
+        }
+
         $response = $this->call(
             RequestFactory::makeForPost(
                 sprintf('orders/%d/comments', $externalId),
                 [
-                    'statusHistory' => [
-                        'comment' => $comment,
-                        'is_customer_notified' => 0,
-                        'is_visible_on_front' => 0,
-                        'parent_id' => $externalId,
-                        'status' => $status,
-                    ],
+                    'statusHistory' => $commentPayload,
                 ]
             )
         );
@@ -129,7 +134,7 @@ class Client
 
         if ($response instanceof ExceptionResponse) {
             $content = $response->getContent();
-            
+
             throw new AdapterException('unexpected-response: ' . ($content && isset($content['message']) ? $content['message'] : 'unknown'));
         }
 
